@@ -1,0 +1,27 @@
+name: s3-upload
+on:
+  push
+env:
+  BUCKET_NAME : github-actions-test-hara
+  AWS_REGION : ap-northeast-1
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  S3PackageUpload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./crm
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::674767932536:role/github-actions-test
+          role-session-name: github-actions-test
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          aws s3 cp ./index.html s3://${{ env.BUCKET_NAME }}/upload/
